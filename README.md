@@ -3,4 +3,4 @@ This repo is for the project in the course DT2470 Music Informatics at KTH.
 
 
 ### Note:
-- A compressed version (.zip) of all songs are uploaded. Unzip when songs are stored locally.
+- Problems uploading song files du to their size. Only stored locally for now.
