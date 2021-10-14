@@ -1,6 +1,8 @@
 
 # Load data
-
+import os
+import pydub
+from pydub import AudioSegment
 
 def load_data(path):
     '''
@@ -19,13 +21,18 @@ def load_data(path):
 
     playlist = []
 
-    # for os.walk()... :
+    for root, dirs, files in os.walk("./songs/house", topdown=False):
+        for file in files:
 
-        #song = AudioSegment.from_whatever(...)
+            audio_file = AudioSegment.from_wav(os.path.join(root, file))
 
-        # extract song name
+            name = extract_song_name(file)
 
-        #playlist.append(song)
+            song_dict = {
+                "song_name": name,
+                "audio_segment": audio_file
+            }
+            playlist.append(song_dict)
 
     '''
     Output structure:
@@ -48,6 +55,9 @@ def load_data(path):
 
     pass
 
+def extract_song_name(file):
+    pass
+
 
 def basic_feature_extraction(playlist):
     '''
@@ -61,6 +71,8 @@ def basic_feature_extraction(playlist):
             }
 
     '''
+
+    frame_rate = audio_file.frame_rate
     
     return playlist
     
