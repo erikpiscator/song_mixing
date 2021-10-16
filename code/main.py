@@ -12,7 +12,7 @@ def main():
 
     # Parse arguments
     arg_parse()
-    load_path = ""
+    load_path = "./songs/house"
     store_path = ""
 
     # Load data

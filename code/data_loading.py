@@ -1,4 +1,3 @@
-
 # Load data
 import os
 import pydub
@@ -15,48 +14,45 @@ def load_data(path):
                 ...
                 real_bpm (Int)
             }
-    
-
     '''
 
     playlist = []
 
-    for root, dirs, files in os.walk("./songs/house", topdown=False):
+    for root, dirs, files in os.walk(path, topdown=False):
         for file in files:
 
             audio_file = AudioSegment.from_wav(os.path.join(root, file))
+            
+            if audio_file.channels > 1:
+                #make sure we are only using one channel. It may not matter.
+                audio_file = audio_file.split_to_mono()[0]
 
-            name = extract_song_name(file)
-
+            song_name, artist_name = extract_names(file)
+        
             song_dict = {
-                "song_name": name,
+                "artist_name": artist_name,
+                "song_name": song_name,
                 "audio_segment": audio_file
             }
+            
             playlist.append(song_dict)
-
-    '''
-    Output structure:
-        list of dictionaries
-            playlist[n] = {
-                name (string)
-                audio_segment (pydub.AudioSegment)
-            }
-    
-
-    '''
         
-
 
     playlist = basic_feature_extraction(playlist)
 
-    playlist = load_bpm(playlist)
+    #playlist = load_bpm(playlist)
 
-    # return playlist
+    return playlist
 
-    pass
 
-def extract_song_name(file):
-    pass
+def extract_names(file):
+    
+    song_name,_,artist_name = file.partition(" - ")
+    song_name = song_name[3:]
+
+    artist_name,_,_ = artist_name.partition(".")
+    
+    return song_name, artist_name
 
 
 def basic_feature_extraction(playlist):
@@ -69,14 +65,13 @@ def basic_feature_extraction(playlist):
                 sampling_rate (double)
                 ...
             }
-
     '''
 
-    frame_rate = audio_file.frame_rate
-    
+    for song in playlist:
+        
+        song["frame_rate"] = song["audio_segment"].frame_rate
+        
     return playlist
-    
-    pass
 
 
 def load_bpm(playlist):
@@ -93,5 +88,4 @@ def load_bpm(playlist):
 def store_song(file, path):
     
     # pydub or whatever
-    
     pass
