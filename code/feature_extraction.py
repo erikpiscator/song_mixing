@@ -1,14 +1,18 @@
-    # Relevant feature extraction
-        # Beat detection
-        # Key detection
-        # Structural segmentation
+# Relevant feature extraction
+    # Beat detection
+    # Key detection
+    # Structural segmentation
 
+from madmom.features.beats import RNNBeatProcessor
+from madmom.features.beats import DBNBeatTrackingProcessor
+
+    
 def feature_extraction(playlist):
 
     for song in playlist:
 
         beats, bpm = beat_detection(song) 
-        song['beats'] = beats # Array like the samples marking with the beat ocurrs
+        song['beat_times'] = beat_times # Array like the samples marking with the beat ocurrs
         song['estimated_bpm'] = bpm # Int
 
         key = key_detection(song)
@@ -25,14 +29,19 @@ def feature_extraction(playlist):
 # FEATURES
 
 def beat_detection(song):
-
-    #beat_times = madmom
+    #NOTE: 'file' is suppose to be a .wav file (or similar).
+    #It is not suppose to be an AudioSegment from pydub.
+    #With this in mind, do we even need pydub?
+    
+    proc = DBNBeatTrackingProcessor(fps=100)
+    act = RNNBeatProcessor()(test_song["song_path"])
+    beat_times = proc(act)
 
     # create the array of ones and zeros
 
     # compute the bpm of the song
 
-    #return beat, bpm
+    #return beat_times, bpm
 
     pass
 
