@@ -11,8 +11,8 @@ def feature_extraction(playlist):
 
     for song in playlist:
 
-        beats, bpm = beat_detection(song) 
-        song['beat_times'] = beat_times # Array like the samples marking with the beat ocurrs
+        beats_frames, bpm = beat_detection(song) 
+        song['beat_times'] = beats_frames # Array like the samples marking with the beat ocurrs, ones/zeros
         song['estimated_bpm'] = bpm # Int
 
         key = key_detection(song)
@@ -29,21 +29,18 @@ def feature_extraction(playlist):
 # FEATURES
 
 def beat_detection(song):
-    #NOTE: 'file' is suppose to be a .wav file (or similar).
-    #It is not suppose to be an AudioSegment from pydub.
-    #With this in mind, do we even need pydub?
     
     proc = DBNBeatTrackingProcessor(fps=100)
     act = RNNBeatProcessor()(test_song["song_path"])
     beat_times = proc(act)
 
     # create the array of ones and zeros
+    beat_frames = convert_to_frames(beat_times,song)
 
     # compute the bpm of the song
+    # bpm = ?
 
-    #return beat_times, bpm
-
-    pass
+    return beat_frames
 
 
 def key_detection(song):
@@ -81,3 +78,11 @@ def evaluate(playlist):
         pass
 
     # print or store or whatever
+
+def convert_to_frames(beat_times, song):
+
+    beat_frames = (beat_times*song["frame_rate"]).astype(int)
+    beat_frames_mapped = np.zeros_like(song["audio_array"])
+    beat_frames_mapped[beat_frames] = 1
+    
+    return beat_frames_mapped
