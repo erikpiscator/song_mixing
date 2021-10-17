@@ -5,6 +5,8 @@
 
 from madmom.features.beats import RNNBeatProcessor
 from madmom.features.beats import DBNBeatTrackingProcessor
+from madmom.features.key import CNNKeyRecognitionProcessor
+from madmom.features.key import key_prediction_to_label
 
     
 def feature_extraction(playlist):
@@ -15,12 +17,12 @@ def feature_extraction(playlist):
         song['beat_times'] = beats_frames # Array like the samples marking with the beat ocurrs, ones/zeros
         song['estimated_bpm'] = bpm # Int
 
-        key = key_detection(song)
-        song['estimated_key'] = key # Probalby string or a int encoding of all the keys
+        key_probabilities, key_label = key_detection(song)
+        song['estimated_key'] = key_label # Probalby string or a int encoding of all the keys
+        song['key_probabilities'] = key_probabilities
 
         cue_points = structural_segmentation(song)
         song['cue_points'] = cue_points # Array like the samples marking with the cue-point ocurrs
-
 
         # Maybe cut silences or if the cue-points in the beginning and the end are too extreme
 
@@ -46,10 +48,12 @@ def beat_detection(song):
 def key_detection(song):
 
     #key = rubberband/madmom (experiment with both)
+    
+    proc = CNNKeyRecognitionProcessor()
+    key_probabilities = proc(song["song_path"])
+    key_label = key_prediction_to_label(key_probabilities)
 
-    #return key
-
-    pass
+    return key_probabilities, key_label
 
 
 def structural_segmentation(song):
