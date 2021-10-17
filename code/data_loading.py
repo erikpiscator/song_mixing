@@ -23,12 +23,13 @@ def load_data(path):
             
 
             audio_file = AudioSegment.from_wav(os.path.join(root, file))
-            audio_array = np.array(audio_file.get_array_of_samples())
+            
             
             if audio_file.channels > 1:
                 #make sure we are only using one channel. It may not matter.
                 audio_file = audio_file.split_to_mono()[0]
-                
+            
+            audio_array = np.array(audio_file.get_array_of_samples())
             song_name, artist_name = extract_names(file)
         
             song_dict = {

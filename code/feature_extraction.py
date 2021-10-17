@@ -40,9 +40,9 @@ def beat_detection(song):
     beat_frames = convert_to_frames(beat_times,song)
 
     # compute the bpm of the song
-    # bpm = ?
+    bpm = beats_per_minute(beat_times,song)
 
-    return beat_frames
+    return beat_frames, bpm
 
 
 def key_detection(song):
@@ -90,3 +90,12 @@ def convert_to_frames(beat_times, song):
     beat_frames_mapped[beat_frames] = 1
     
     return beat_frames_mapped
+
+def beats_per_minute(beat_times, song):
+    
+    song_length = len(song["audio_array"])/song["frame_rate"]/60
+    beats_count = len(beat_times)
+    
+    bpm = beats_count/song_length
+    
+    return bpm
