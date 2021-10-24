@@ -13,7 +13,7 @@ def main():
     # Parse arguments
     arg_parse()
     load_path = "./songs/house"
-    store_path = ""
+    store_path = "./song_mix.wav"
 
     # Load data
 

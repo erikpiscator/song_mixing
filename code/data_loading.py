@@ -2,6 +2,7 @@
 import os
 import numpy as np
 from pydub import AudioSegment
+import csv
 
 def load_data(path):
     '''
@@ -44,7 +45,7 @@ def load_data(path):
         
     playlist = basic_feature_extraction(playlist)
 
-    #playlist = load_bpm(playlist)
+    playlist = load_true_bpm(playlist)
 
     return playlist
 
@@ -78,18 +79,29 @@ def basic_feature_extraction(playlist):
     return playlist
 
 
-def load_bpm(playlist):
+def load_true_bpm(playlist):
 
     #load csv with the bpms
+    
+    with open("songs.csv", "r") as file:
+        csv_reader = csv.DictReader(file,delimiter=",")
+        playlist_true_bpm = list(csv_reader)
+    
 
     for song in playlist:
-        # lookup the name on the csv and retrieve the actual bpms
-        pass
+        flag = 0
+        for song_ref in playlist_true_bpm:
+            if song["song_name"] == song_ref["song_name"]:
+                song["true_bpm"] = song_ref["bpm"]
+                flag = 1
+        if flag == 0:
+            # Don't know if this is the best way of raising an error. 
+            # Please change to a better one if you know one.
+            print("No true bpm found for song:", song["song_name"])
 
     return playlist
 
 
 def store_song(file, path):
     
-    # pydub or whatever
-    pass
+    file.export(path,format='wav')
