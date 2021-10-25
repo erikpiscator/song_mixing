@@ -4,7 +4,6 @@
     # tree search for optimal sequence
 
 
-
 def get_song_sequence(playlist):
 
     unassigned = playlist.copy()
@@ -19,9 +18,9 @@ def get_song_sequence(playlist):
 
     while unassigned:
 
-       nex_song = pick_next_song(queue[-1], unassigned)
-       queue.append(nex_song)
-       unassigned.remove(nex_song) 
+        next_song = pick_next_song(queue[-1], unassigned)
+        queue.append(next_song)
+        unassigned.remove(next_song) 
 
     return queue
 
@@ -38,16 +37,29 @@ def pick_next_song(current, options):
             - Picking the most similar one in key
             (see the paper for inspiration in distances between keys)
     '''
-
+    
     selection = options[0]
+    lower_bound, upper_bound = bpm_bounds(current["bpm"],thresh)
+    current_key_distance = key_distance(current["key"],selection["key"])
+    
 
     for song in options:
+        
+        if song["bpm"] >= lower_bound && song["bpm"] <= upper_bound:
+            
+            optional_key_distance = key_distance(current["key"],song["key"])
+            
+            if optional_key_distance < current_key_distance:
+                
+                selection = song
+        
 
-        #if song is better option than selection, pick song
+    return selection
 
-        pass
+def bpm_bounds(bpm,thresh):
+    
+    return bpm-thresh, bpm+thresh
 
-    #return selection  
-
-
+def key_distance(key1,key2):
+    
     pass
