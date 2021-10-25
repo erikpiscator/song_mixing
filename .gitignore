@@ -3,3 +3,4 @@
 /songs
 testing_notebook.ipynb
 .ipynb_checkpoints
+*.pyc

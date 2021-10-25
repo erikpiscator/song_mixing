@@ -49,5 +49,14 @@ def main():
 
 
 
+def test_region():
+    load_path = "../songs/test"
+    playlist = load_data(load_path)
+
+    print(playlist[0]['song_path'])
+
+    feature_extraction(playlist)
+
+
 if __name__ == '__main__':
-    main()
+    test_region()

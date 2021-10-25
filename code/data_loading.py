@@ -30,7 +30,7 @@ def load_data(path):
                 #make sure we are only using one channel. It may not matter.
                 audio_file = audio_file.split_to_mono()[0]
             
-            audio_array = np.array(audio_file.get_array_of_samples())
+            audio_array = np.array(audio_file.get_array_of_samples(), dtype=float)
             song_name, artist_name = extract_names(file)
         
             song_dict = {
@@ -38,14 +38,14 @@ def load_data(path):
                 "song_name": song_name,
                 "audio_segment": audio_file,
                 "audio_array": audio_array,
-                "song_path": path
+                "song_path": os.path.join(root, file)
             }
             
             playlist.append(song_dict)
         
     playlist = basic_feature_extraction(playlist)
 
-    playlist = load_true_bpm(playlist)
+    #playlist = load_true_bpm(playlist)
 
     return playlist
 
