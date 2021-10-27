@@ -21,16 +21,22 @@ import utils
 
 def feature_extraction(playlist):
 
-    for song in playlist:
+    print('Extracting features')
+    for i, song in enumerate(playlist):
+        print(f'\tSong {i+1} / {len(playlist)}')
 
+        print('\t\tEstimating beat...')
         beats_frames, bpm = beat_detection(song) 
         song['beat_times'] = beats_frames # Array like the samples marking with the beat ocurrs, ones/zeros
         song['estimated_bpm'] = bpm # Int
 
+        print('\t\tEstimating key...')
         key_probabilities, key_label = key_detection(song)
-        song['estimated_key'] = key_label # Probalby string or a int encoding of all the keys
+        song['estimated_key'] = key_label.split(' ')[0] # Probalby string or a int encoding of all the keys
+        song['estimated_mode'] = key_label.split(' ')[1]
         song['key_probabilities'] = key_probabilities
 
+        print('\t\tEstimating cue-points')
         cue_points = structural_segmentation(song)
         song['cue_points'] = cue_points # Array like the samples marking with the cue-point ocurrs
 
@@ -110,11 +116,11 @@ def structural_segmentation(song):
 
     peaks_rel_pos, peaks_amp = detect_peaks(novelty)
 
-    utils.save_cmap(mfcc_ssm, 'mfcc_smm.png', ' MFCC Self-Similarity Matrix')
-    utils.save_cmap(rms_ssm, 'mfcc_smm.png', ' MFCC Self-Similarity Matrix')
-    utils.save_cmap(kernel, 'kernel', 'Checkboard Gaussian Kernel')
-    utils.save_line(range(len(novelty)), novelty, 'novelty.png', 'Novelty function', 'Frames', 'Amplitude')
-    utils.save_line(peaks_rel_pos, peaks_amp, 'peaks.png', 'Novelty peaks', 'Frames', 'Amplitude')
+    utils.save_cmap(mfcc_ssm, '../figures/mfcc_smm.png', ' MFCC Self-Similarity Matrix')
+    utils.save_cmap(rms_ssm, '../figures/mfcc_smm.png', ' MFCC Self-Similarity Matrix')
+    utils.save_cmap(kernel, '../figures/kernel', 'Checkboard Gaussian Kernel')
+    utils.save_line(range(len(novelty)), novelty, '../figures/novelty.png', 'Novelty function', 'Frames', 'Amplitude')
+    utils.save_line(peaks_rel_pos, peaks_amp, '../figures/peaks.png', 'Novelty peaks', 'Frames', 'Amplitude', '.')
 
     peaks_abs_pos = peaks_rel_pos * hop_size
 
