@@ -5,13 +5,15 @@
 
 
 circle_of_fifths = {
-    "major": ["C", "G", "D", "A", "E", "B", "F#", "C#", "G#", "D#", "A#", "F"],
-    "minor": ["A", "E", "B", "F#", "C#", "G#", "D#", "A#", "F", "C", "G", "D"],
+    "major": ["C", "G", "D", "A", "E", "B", "F#", "Db", "Ab", "Eb", "Bb", "F"],
+    "minor": ["A", "E", "B", "F#", "C#", "G#", "D#", "Bb", "F", "C", "G", "D"],
 }
-scale = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+scale = ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"]
 
 
 def get_song_sequence(playlist):
+
+    print("Selecting tracks order...")
 
     not_in_queue = playlist.copy()
 

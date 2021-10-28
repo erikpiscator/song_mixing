@@ -15,6 +15,7 @@ from madmom.features.key import key_prediction_to_label
 
 import librosa
 
+import essentia
 from essentia.standard import FrameGenerator, PeakDetection
 
 import utils
@@ -156,7 +157,7 @@ def mfcc_structural_similarity_matrix(song, frame_size, hop_size):
 def rms_structural_similarity_matrix(song, frame_size, hop_size):
 
     rms_list = []
-    for frame in FrameGenerator(song['audio_array'], frameSize = frame_size, hopSize = hop_size):
+    for frame in FrameGenerator(essentia.array(song['audio_array']), frameSize = frame_size, hopSize = hop_size):
         rms_list.append(np.average(frame**2))
 
     ssm = sklearn.metrics.pairwise.pairwise_distances(np.array(rms_list).reshape(-1, 1))

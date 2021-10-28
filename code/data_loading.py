@@ -3,6 +3,7 @@ import os
 import numpy as np
 from pydub import AudioSegment
 import csv
+import scipy
 
 def load_data(path):
     '''
@@ -17,19 +18,20 @@ def load_data(path):
             }
     '''
 
+    print(f"Loading data from {path}...")
+
     playlist = []
 
     for root, dirs, files in os.walk(path, topdown=False):
         for file in files:
-            
-
+    
             audio_file = AudioSegment.from_wav(os.path.join(root, file))
-            
             
             if audio_file.channels > 1:
                 #make sure we are only using one channel. It may not matter.
                 audio_file = audio_file.split_to_mono()[0]
             
+
             audio_array = np.array(audio_file.get_array_of_samples(), dtype=float)
             song_name, artist_name = extract_names(file)
         
@@ -40,12 +42,15 @@ def load_data(path):
                 "audio_array": audio_array,
                 "song_path": os.path.join(root, file)
             }
+
+            
             
             playlist.append(song_dict)
-        
-    playlist = basic_feature_extraction(playlist)
 
+    playlist = basic_feature_extraction(playlist)
     #playlist = load_true_bpm(playlist)
+
+    print(f"\t{len(playlist)} songs loaded")
 
     return playlist
 
@@ -102,6 +107,6 @@ def load_true_bpm(playlist):
     return playlist
 
 
-def store_song(file, path):
+def store_song(mix, path):
     
-    file.export(path,format='wav')
+    scipy.io.wavfile.write(path, rate=mix["frame_rate"], data=mix["audio_array"].astype("int32"))
