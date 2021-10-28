@@ -12,7 +12,7 @@ def main():
 
     # Parse arguments
     arg_parse()
-    load_path = "../songs/test4/"
+    load_path = "../songs/dev_songs_pop_2020s/"
     store_path = "./song_mix_2.wav"
 
     # Load data
@@ -20,20 +20,20 @@ def main():
     playlist = load_data(load_path)
 
     if not playlist:
-        print('No song found')
+        print("No song found")
         exit()
 
-    print(playlist[-1]['frame_rate'])
-    
+    print(playlist[-1]["frame_rate"])
+
     # - Sequence of songs (in np array format) with minor features (e.g. Sampling rate)
 
     # Relevant feature extraction
-    
+
     playlist = feature_extraction(playlist)
 
     # Compute evaluation stats and show/store
 
-    #evaluate(playlist)
+    # evaluate(playlist)
 
     # - Sequence of songs with their relevant features (dict)
 
@@ -54,15 +54,14 @@ def main():
     store_song(mix, store_path)
 
 
-
 def test_region():
     load_path = "../songs/test"
     playlist = load_data(load_path)
 
-    print(playlist[0]['song_path'])
+    print(playlist[0]["song_path"])
 
     feature_extraction(playlist)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
