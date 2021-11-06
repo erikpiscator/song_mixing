@@ -21,45 +21,34 @@ def main():
     store_path = "../songs/dev_songs_house_output/song_mix_new_14.wav"
 
     # Load data
-
     playlist = load_data(load_path)
 
     if not playlist:
         print("No song found")
         exit()
 
-    # print(playlist[-1]["frame_rate"])
-
     # - Sequence of songs (in np array format) with minor features (e.g. Sampling rate)
 
     # Relevant feature extraction
-
     playlist = feature_extraction(playlist)
 
     # Compute evaluation stats and show/store
-
     # evaluate(playlist)
 
     # - Sequence of songs with their relevant features (dict)
 
     # Choosing the sequence
-
     queue = get_song_sequence(playlist)
 
     # - We will have the ordered sequence of songs
 
     # Create the transition for one pair of songs
-
     mix = create_transitions(queue)
 
     # - Long song mixed
 
     # Store the song in desired format
-
     store_song(mix, store_path)
-    #store_song(previous_mix_faded, "../songs/dev_songs_house_output/prev_mix_faded_linear.wav")
-    #store_song(next_song_faded, "../songs/dev_songs_house_output/new_song_faded_linear.wav")
-
 
 def test_region():
     load_path = "../songs/test"

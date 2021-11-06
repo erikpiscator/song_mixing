@@ -56,7 +56,7 @@ def mix_pair(previous_mix, next_song):
     print("\t\tCombining tracks...")
     mix = combine_songs(previous_mix_faded, next_song_faded, previous_ending)
 
-    return mix#, previous_mix_faded, next_song_faded
+    return mix
 
 
 def select_cue_points(previous_mix):
@@ -73,7 +73,6 @@ def select_cue_points(previous_mix):
             flag = True
         i += 1
     
-
     return cue_point
 
 
@@ -92,14 +91,13 @@ def align(next_song):
 
 def time_wrap(previous_mix, next_song, previous_mix_cue_point):
 
+    transition_length_seconds = 20
     avg_bpm = (previous_mix["estimated_bpm"] + next_song["estimated_bpm"]) / 2
 
     ending_stretching_ratio = previous_mix["estimated_bpm"] / avg_bpm
     beginning_stretching_ratio = next_song["estimated_bpm"] / avg_bpm
 
     cue_point_idx = np.where(previous_mix_cue_point == 1)[0][0]
-    
-    transition_length_seconds = 20
 
     transition_length_prev_frames_stretched = transition_length_seconds * previous_mix["frame_rate"]
     transition_length_prev_frames = int(transition_length_prev_frames_stretched / ending_stretching_ratio)

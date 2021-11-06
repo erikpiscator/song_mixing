@@ -42,9 +42,6 @@ def feature_extraction(playlist):
         cue_points = structural_segmentation(song)
         song['cue_points'] = cue_points      # Array like the samples marking with the cue-point ocurrs 
 
-        # Maybe cut silences or if the cue-points in
-        # the beginning and the end are too extreme
-
     return playlist
 
 
@@ -241,4 +238,3 @@ def evaluate(playlist):
         # Evaluating sort of acc in bpm detection
         pass
 
-    # print or store or whatever
