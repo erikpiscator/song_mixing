@@ -4,6 +4,7 @@
 #   - Key changing (explore strategies)
 #   - Align all the sequence according to modified beats (try to do it with downbeats)
 #   - Volume fades to mix both
+
 import numpy as np
 import rubberband as rb
 
