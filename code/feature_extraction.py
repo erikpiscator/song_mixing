@@ -1,9 +1,9 @@
 # Relevant feature extraction
-    # Beat detection
-    # Key detection
-    # Structural segmentation
+# Beat detection
+# Key detection
+# Structural segmentation
 
-from librosa.util.utils import frame
+# from librosa.util.utils import frame
 import numpy as np
 import scipy
 import sklearn
@@ -20,35 +20,38 @@ from essentia.standard import FrameGenerator, PeakDetection
 
 import utils
 
-def feature_extraction(playlist):
 
+def feature_extraction(playlist):
     print('Extracting features')
+
     for i, song in enumerate(playlist):
         print(f'\tSong {i+1} / {len(playlist)}')
 
         print('\t\tEstimating beat...')
-        beats_frames, bpm = beat_detection(song) 
-        song['beat_times'] = beats_frames # Array like the samples marking with the beat ocurrs, ones/zeros
-        song['estimated_bpm'] = bpm # Int
+        beats_frames, bpm = beat_detection(song)
+        song['beat_times'] = beats_frames   # Array like the samples marking with the beat ocurrs, ones/zeros
+        song['estimated_bpm'] = bpm         # Int
 
         print('\t\tEstimating key...')
         key_probabilities, key_label = key_detection(song)
-        song['estimated_key'] = key_label.split(' ')[0] # Probalby string or a int encoding of all the keys
+        song['estimated_key'] = key_label.split(' ')[0]        # Probalby string or a int encoding of all the keys
         song['estimated_mode'] = key_label.split(' ')[1]
         song['key_probabilities'] = key_probabilities
 
         print('\t\tEstimating cue-points')
         cue_points = structural_segmentation(song)
-        song['cue_points'] = cue_points # Array like the samples marking with the cue-point ocurrs
+        song['cue_points'] = cue_points      # Array like the samples marking with the cue-point ocurrs 
 
-        # Maybe cut silences or if the cue-points in the beginning and the end are too extreme
+        # Maybe cut silences or if the cue-points in
+        # the beginning and the end are too extreme
 
     return playlist
+
 
 # FEATURES
 
 def beat_detection(song):
-    
+
     proc = DBNBeatTrackingProcessor(fps=100)
     act = RNNBeatProcessor()(song["song_path"])
     beat_times = proc(act)
@@ -204,7 +207,7 @@ def apply_kernel(ssm, kernel):
 
 def detect_peaks(novelty):
 
-    threshold = np.max(novelty) * 0.05
+    threshold = np.max(novelty) * 0.025
     
     peakDetection = PeakDetection(interpolate=False, maxPeaks=100, orderBy='amplitude', range=len(novelty), maxPosition=len(novelty), threshold=threshold)
     peaks_pos, peaks_ampl = peakDetection(novelty.astype('single'))

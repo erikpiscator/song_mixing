@@ -44,42 +44,34 @@ def mix_pair(previous_mix, next_song):
     next_song_aligned = align(next_song)
 
     print("\t\tMixing beats...")
-    (
-        previous_mix_stretched,
-        next_song_stretched,
-        previous_ending,
-        next_beginning,
-    ) = time_wrap(previous_mix, next_song_aligned, previous_mix_cue_point)
+    previous_mix_stretched,next_song_stretched,previous_ending,next_beginning = time_wrap(previous_mix, next_song_aligned, previous_mix_cue_point)
 
-    print("\t\tTransposing keys...")
+    #print("\t\tTransposing keys...")
     # previous_mix, next_song = key_change(previous_mix_stretched, next_song_stretched)
 
     print("\t\tFading transition...")
-    previous_mix_faded, next_song_faded = fade(
-        previous_mix_stretched, next_song_stretched, previous_ending, next_beginning
-    )
+    previous_mix_faded, next_song_faded = fade(previous_mix_stretched, next_song_stretched, previous_ending, next_beginning)
 
     print("\t\tCombining tracks...")
     mix = combine_songs(previous_mix_faded, next_song_faded, previous_ending)
 
-    return mix
+    return mix#, previous_mix_faded, next_song_faded
 
 
 def select_cue_points(previous_mix):
 
-    max_transition_length = 20
-
     cue_point = np.zeros_like(previous_mix["cue_points"])
-
     possible_idx = np.where(previous_mix["cue_points"] == 1)[0]
 
-    cue_point_idx = possible_idx[
-        possible_idx
-        > previous_mix["cue_points"].size
-        - max_transition_length * previous_mix["frame_rate"]
-    ][0]
-
-    cue_point[cue_point_idx] = 1
+    flag = False
+    i = 1
+    while flag == False:
+        # select first cue point that are at least 20s from end.
+        if (len(previous_mix["audio_array"]) - possible_idx[-i]) / previous_mix["frame_rate"] >= 20:
+            cue_point[possible_idx[-i]] = 1
+            flag = True
+        i += 1
+    
 
     return cue_point
 
@@ -105,83 +97,41 @@ def time_wrap(previous_mix, next_song, previous_mix_cue_point):
     beginning_stretching_ratio = next_song["estimated_bpm"] / avg_bpm
 
     cue_point_idx = np.where(previous_mix_cue_point == 1)[0][0]
+    
+    transition_length_seconds = 20
 
-    ending_length_samples = previous_mix["audio_array"].size - cue_point_idx
-    transition_length = ending_length_samples * ending_stretching_ratio
-    transition_length_seconds = transition_length / previous_mix["frame_rate"]
-    beginning_length_stretched = transition_length_seconds * next_song["frame_rate"]
-    beginning_length_samples = int(
-        beginning_length_stretched * beginning_stretching_ratio
-    )
+    transition_length_prev_frames_stretched = transition_length_seconds * previous_mix["frame_rate"]
+    transition_length_prev_frames = int(transition_length_prev_frames_stretched / ending_stretching_ratio)
 
-    ending_audio = previous_mix["audio_array"][-ending_length_samples:]
-    ending_beats = previous_mix["beat_times"][-ending_length_samples:]
-    beginning_audio = next_song["audio_array"][:beginning_length_samples]
-    beginning_beats = next_song["beat_times"][:beginning_length_samples]
+    transition_length_next_frames_stretched = transition_length_seconds * next_song["frame_rate"]
+    transition_length_next_frames = int(transition_length_next_frames_stretched / beginning_stretching_ratio)
 
-    ending_audio_stretched = rb.stretch(
-        np.array(ending_audio, dtype="int32"),
-        rate=previous_mix["frame_rate"],
-        ratio=ending_stretching_ratio,
-        crispness=5,
-        formants=False,
-        precise=True,
-    )
-    beginning_audio_stretched = rb.stretch(
-        np.array(beginning_audio, dtype="int32"),
-        rate=next_song["frame_rate"],
-        ratio=beginning_stretching_ratio,
-        crispness=5,
-        formants=False,
-        precise=True,
-    )
+    ending_audio = previous_mix["audio_array"][cue_point_idx : cue_point_idx + transition_length_prev_frames]
+    ending_beats = previous_mix["beat_times"][cue_point_idx : cue_point_idx + transition_length_prev_frames]
+    beginning_audio = next_song["audio_array"][:transition_length_next_frames]
+    beginning_beats = next_song["beat_times"][:transition_length_next_frames]
 
-    ending_beats_stretched = stretch_beats(
-        ending_beats, ending_stretching_ratio, ending_audio_stretched.size
-    )
-    beginning_beats_stretched = stretch_beats(
-        beginning_beats, beginning_stretching_ratio, beginning_audio_stretched.size
-    )
+
+    ending_audio_stretched = rb.stretch(np.array(ending_audio, dtype="int32"),rate=previous_mix["frame_rate"],ratio=ending_stretching_ratio,crispness=6,formants=False,precise=True)
+    beginning_audio_stretched = rb.stretch(np.array(beginning_audio, dtype="int32"),rate=next_song["frame_rate"],ratio=beginning_stretching_ratio,crispness=6,formants=False,precise=True)
+
+    ending_beats_stretched = stretch_beats(ending_beats, ending_stretching_ratio, ending_audio_stretched.size)
+    beginning_beats_stretched = stretch_beats(beginning_beats, beginning_stretching_ratio, beginning_audio_stretched.size)
+
+    previous_mix["estimated_bpm"] = next_song["estimated_bpm"]
 
     new_previous = previous_mix.copy()
-    new_previous["audio_array"] = np.concatenate(
-        (new_previous["audio_array"][:-ending_length_samples], ending_audio_stretched)
-    )
-    new_previous["beat_times"] = np.concatenate(
-        (new_previous["beat_times"][:-ending_length_samples], ending_beats_stretched)
-    )
-    new_previous["cue_points"] = np.concatenate(
-        (
-            new_previous["cue_points"][:-ending_length_samples],
-            np.zeros(
-                ending_audio_stretched.size, dtype=previous_mix["cue_points"].dtype
-            ),
-        )
-    )
+    
+    new_previous["audio_array"] = np.concatenate((new_previous["audio_array"][:cue_point_idx], ending_audio_stretched))
+    new_previous["beat_times"] = np.concatenate((new_previous["beat_times"][:cue_point_idx], ending_beats_stretched))
+    new_previous["cue_points"] = np.concatenate((new_previous["cue_points"][:cue_point_idx],np.zeros(ending_audio_stretched.size, dtype=previous_mix["cue_points"].dtype)))
 
     new_next = next_song.copy()
-    new_next["audio_array"] = np.concatenate(
-        (beginning_audio_stretched, new_next["audio_array"][beginning_length_samples:])
-    )
-    new_next["beat_times"] = np.concatenate(
-        (beginning_beats_stretched, new_next["beat_times"][beginning_length_samples:])
-    )
-    new_next["cue_points"] = np.concatenate(
-        (
-            np.zeros(
-                beginning_audio_stretched.size, dtype=next_song["cue_points"].dtype
-            ),
-            next_song["cue_points"][beginning_length_samples:],
-        )
-    )
+    new_next["audio_array"] = np.concatenate((beginning_audio_stretched, new_next["audio_array"][transition_length_next_frames:]))
+    new_next["beat_times"] = np.concatenate((beginning_beats_stretched, new_next["beat_times"][transition_length_next_frames:]))
+    new_next["cue_points"] = np.concatenate((np.zeros(beginning_audio_stretched.size, dtype=next_song["cue_points"].dtype),next_song["cue_points"][transition_length_next_frames:]))
 
-    return (
-        new_previous,
-        new_next,
-        new_previous["audio_array"][:-ending_length_samples].size,
-        beginning_audio_stretched.size,
-    )
-
+    return (new_previous,new_next,new_previous["audio_array"][:cue_point_idx].size,beginning_audio_stretched.size)
 
 def stretch_beats(beat_times, stretching_ratio, desired_length):
 
@@ -214,6 +164,19 @@ def key_change(previous_mix, next_song, previous_mix_cue_point, next_song_cue_po
 
 def fade(previous_mix, next_song, previous_mix_cue_point, next_song_cue_point):
 
+    fade_seconds = 20
+    fade_frames = fade_seconds * previous_mix["frame_rate"]
+
+    for i in range(fade_frames):
+
+        #exponential fade
+        #previous_mix["audio_array"][-i] = previous_mix["audio_array"][-i] * (1.1 - np.exp(2.398 * (1 - i / fade_frames)) * 0.1)
+        #next_song["audio_array"][i] = next_song["audio_array"][i] * (0.1 * np.exp(2.398 * i / fade_frames) - 0.1)
+
+        #linear fade
+        previous_mix["audio_array"][-i] = previous_mix["audio_array"][-i] * i/fade_frames
+        next_song["audio_array"][i] = next_song["audio_array"][i] * i/fade_frames
+
     return previous_mix, next_song
 
 
@@ -221,23 +184,15 @@ def combine_songs(previous_mix, next_song, previous_ending):
 
     mix = previous_mix.copy()
 
-    next_audio_padded = np.pad(
-        next_song["audio_array"], (previous_ending, 0), constant_values=0
-    )
-    next_beat_padded = np.pad(
-        next_song["beat_times"], (previous_ending, 0), constant_values=0
-    )
-    next_cue_padded = np.pad(
-        next_song["cue_points"], (previous_ending, 0), constant_values=0
-    )
+    next_audio_padded = np.pad(next_song["audio_array"], (previous_ending, 0), constant_values=0)
+    next_beat_padded = np.pad(next_song["beat_times"], (previous_ending, 0), constant_values=0)
+    next_cue_padded = np.pad(next_song["cue_points"], (previous_ending, 0), constant_values=0)
 
     mix["audio_array"] = next_audio_padded
     mix["beat_times"] = next_beat_padded
     mix["cue_points"] = next_cue_padded
 
-    mix["audio_array"][: previous_mix["audio_array"].size] += previous_mix[
-        "audio_array"
-    ]
+    mix["audio_array"][: previous_mix["audio_array"].size] += previous_mix["audio_array"]
     mix["beat_times"][: previous_mix["beat_times"].size] += previous_mix["beat_times"]
     mix["cue_points"][: previous_mix["cue_points"].size] += previous_mix["cue_points"]
 

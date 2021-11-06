@@ -1,3 +1,8 @@
+# Hyperparams
+# Peak selection threshold: 0.025
+# Song selection BPM threshold: 4
+# Transition length: 20s
+
 from data_loading import load_data, store_song
 from feature_extraction import feature_extraction, evaluate
 from track_selection import get_song_sequence
@@ -12,8 +17,8 @@ def main():
 
     # Parse arguments
     arg_parse()
-    load_path = "../songs/dev_songs_pop_2020s/"
-    store_path = "./song_mix_2.wav"
+    load_path = "../songs/dev_songs_house/"
+    store_path = "../songs/dev_songs_house_output/song_mix_new_14.wav"
 
     # Load data
 
@@ -23,7 +28,7 @@ def main():
         print("No song found")
         exit()
 
-    print(playlist[-1]["frame_rate"])
+    # print(playlist[-1]["frame_rate"])
 
     # - Sequence of songs (in np array format) with minor features (e.g. Sampling rate)
 
@@ -52,6 +57,8 @@ def main():
     # Store the song in desired format
 
     store_song(mix, store_path)
+    #store_song(previous_mix_faded, "../songs/dev_songs_house_output/prev_mix_faded_linear.wav")
+    #store_song(next_song_faded, "../songs/dev_songs_house_output/new_song_faded_linear.wav")
 
 
 def test_region():

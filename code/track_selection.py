@@ -42,7 +42,7 @@ def pick_next_song(current, options):
         (see the paper for inspiration in distances between keys)
     """
 
-    threshold = 10
+    threshold = 4
 
     selection = None
     current_bpm = current["estimated_bpm"]
