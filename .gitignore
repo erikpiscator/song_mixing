@@ -7,4 +7,5 @@ testing_notebook.ipynb
 .vscode/
 *.wav
 *.png
+*.vim
 
