@@ -7,6 +7,9 @@
 
 import numpy as np
 import rubberband as rb
+from utils import convert
+
+store_path_transition_times = "../listening_test/mixes/mix_B_info.txt"
 
 
 def create_transitions(queue):
@@ -18,7 +21,10 @@ def create_transitions(queue):
     for i in range(1, len(queue)):
 
         print(f"\tMixing tracks {i} and {i+1}...")
-        mix = mix_pair(mix, queue[i])
+        mix, transition_time = mix_pair(mix, queue[i])
+
+        with open(store_path_transition_times, "a") as myFile:
+            myFile.write(f"Transition {i} at time {convert(transition_time)}.\n")
 
     return mix
 
@@ -56,7 +62,7 @@ def mix_pair(previous_mix, next_song):
     print("\t\tCombining tracks...")
     mix = combine_songs(previous_mix_faded, next_song_faded, previous_ending)
 
-    return mix
+    return mix, previous_ending/previous_mix["frame_rate"]
 
 
 def select_cue_points(previous_mix):

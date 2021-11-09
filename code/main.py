@@ -17,8 +17,9 @@ def main():
 
     # Parse arguments
     arg_parse()
-    load_path = "../songs/dev_songs_rock_80s/"
-    store_path = "../output/song_mix_rock_80s_1.wav"
+    load_path = "../songs/dev_songs_house/"
+    store_path = "../listening_test/mixes/mix_B.wav"
+    store_path_transition_times = "../listening_test/mixes/mix_B_info.txt"
 
     # Load data
     playlist = load_data(load_path)
@@ -41,6 +42,13 @@ def main():
     queue = get_song_sequence(playlist)
 
     # - We will have the ordered sequence of songs
+
+    with open(store_path_transition_times, "a") as myFile:
+        myFile.write(f"\n-----Tracklist-----\n\n")
+        for song in queue:
+            myFile.write(f"{song['song_name']} - {song['artist_name']}\n")
+        myFile.write(f"\n-------------------\n\n")
+        
 
     # Create the transition for one pair of songs
     mix = create_transitions(queue)
