@@ -1,0 +1,11 @@
+.DS_Store
+*/.DS_Store
+/songs
+testing_notebook.ipynb
+.ipynb_checkpoints
+*.pyc
+.vscode/
+*.wav
+*.png
+*.vim
+
