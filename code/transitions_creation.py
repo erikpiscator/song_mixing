@@ -51,7 +51,7 @@ def mix_pair(previous_mix, next_song):
     # previous_mix, next_song = key_change(previous_mix_stretched, next_song_stretched)
 
     print("\t\tFading transition...")
-    previous_mix_faded, next_song_faded = fade(previous_mix_stretched, next_song_stretched, previous_ending, next_beginning)
+    previous_mix_faded, next_song_faded = fade(previous_mix_stretched, next_song_stretched)
 
     print("\t\tCombining tracks...")
     mix = combine_songs(previous_mix_faded, next_song_faded, previous_ending)
@@ -161,7 +161,7 @@ def key_change(previous_mix, next_song, previous_mix_cue_point, next_song_cue_po
     return previous_mix, next_song
 
 
-def fade(previous_mix, next_song, previous_mix_cue_point, next_song_cue_point):
+def fade(previous_mix, next_song):
 
     fade_seconds = 20
     fade_frames = fade_seconds * previous_mix["frame_rate"]

@@ -4,6 +4,7 @@ import numpy as np
 from pydub import AudioSegment
 import csv
 import scipy
+from scipy.io.wavfile import write
 
 
 def load_data(path):
@@ -109,6 +110,4 @@ def load_true_bpm(playlist):
 
 def store_song(mix, path):
 
-    scipy.io.wavfile.write(
-        path, rate=mix["frame_rate"], data=mix["audio_array"].astype("int32")
-    )
+    write(path, rate=mix["frame_rate"], data=mix["audio_array"].astype("int32"))
