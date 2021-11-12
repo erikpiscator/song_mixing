@@ -8,5 +8,7 @@ testing_notebook.ipynb
 *.wav
 *.png
 *.vim
+/listening_test
+songs.csv
 
 *.png
