@@ -9,7 +9,7 @@ import numpy as np
 import rubberband as rb
 from utils import convert
 
-store_path_transition_times = "../listening_test/mixes/mix_final_av_info.txt"
+store_path_transition_times = "../output/mix_name_info.txt"
 
 
 def create_transitions(queue):

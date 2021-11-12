@@ -17,9 +17,9 @@ def main():
 
     # Parse arguments
     arg_parse()
-    load_path = "../songs/test2"
-    store_path = "../listening_test/mixes/mix_final.wav"
-    store_path_transition_times = "../listening_test/mixes/mix_final_1.txt"
+    load_path = "../sample_songs"
+    store_path = "../output/mix_name.wav"
+    store_path_transition_times = "../output/mix_name_info.txt"
 
     # Load data
     playlist = load_data(load_path)
