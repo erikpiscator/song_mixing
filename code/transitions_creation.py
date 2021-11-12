@@ -9,7 +9,7 @@ import numpy as np
 import rubberband as rb
 from utils import convert
 
-store_path_transition_times = "../listening_test/mixes/mix_B_info.txt"
+store_path_transition_times = "../listening_test/mixes/mix_final_av_info.txt"
 
 
 def create_transitions(queue):
@@ -116,9 +116,8 @@ def time_wrap(previous_mix, next_song, previous_mix_cue_point):
     beginning_audio = next_song["audio_array"][:transition_length_next_frames]
     beginning_beats = next_song["beat_times"][:transition_length_next_frames]
 
-
-    ending_audio_stretched = rb.stretch(np.array(ending_audio, dtype="int32"),rate=previous_mix["frame_rate"],ratio=ending_stretching_ratio,crispness=6,formants=False,precise=True)
-    beginning_audio_stretched = rb.stretch(np.array(beginning_audio, dtype="int32"),rate=next_song["frame_rate"],ratio=beginning_stretching_ratio,crispness=6,formants=False,precise=True)
+    ending_audio_stretched = rb.stretch(np.array(ending_audio, dtype=previous_mix["dtype"]),rate=previous_mix["frame_rate"],ratio=ending_stretching_ratio,crispness=6,formants=False,precise=True)
+    beginning_audio_stretched = rb.stretch(np.array(beginning_audio, dtype=next_song["dtype"]),rate=next_song["frame_rate"],ratio=beginning_stretching_ratio,crispness=6,formants=False,precise=True)
 
     ending_beats_stretched = stretch_beats(ending_beats, ending_stretching_ratio, ending_audio_stretched.size)
     beginning_beats_stretched = stretch_beats(beginning_beats, beginning_stretching_ratio, beginning_audio_stretched.size)

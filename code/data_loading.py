@@ -38,6 +38,10 @@ def load_data(path):
 
             audio_array = np.array(audio_file.get_array_of_samples(), dtype=float)
             song_name, artist_name = extract_names(file)
+            
+            dtype = "int16"
+            if np.max(audio_array) > 32767:
+                dtype = "int32"
 
             song_dict = {
                 "artist_name": artist_name,
@@ -45,6 +49,7 @@ def load_data(path):
                 "audio_segment": audio_file,
                 "audio_array": audio_array,
                 "song_path": os.path.join(root, file),
+                "dtype": dtype
             }
 
             playlist.append(song_dict)
@@ -110,4 +115,4 @@ def load_true_bpm(playlist):
 
 def store_song(mix, path):
 
-    write(path, rate=mix["frame_rate"], data=mix["audio_array"].astype("int32"))
+    write(path, rate=mix["frame_rate"], data=mix["audio_array"].astype(mix["dtype"]))
